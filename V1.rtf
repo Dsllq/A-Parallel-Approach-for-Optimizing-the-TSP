@@ -1,0 +1,183 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red183\green111\blue179;\red24\green24\blue24;\red70\green137\blue204;
+\red194\green126\blue101;\red193\green193\blue193;\red89\green138\blue67;\red167\green197\blue152;\red140\green211\blue254;
+\red202\green202\blue202;\red67\green192\blue160;\red212\green214\blue154;\red205\green173\blue106;}
+{\*\expandedcolortbl;;\cssrgb\c77255\c52549\c75294;\cssrgb\c12157\c12157\c12157;\cssrgb\c33725\c61176\c83922;
+\cssrgb\c80784\c56863\c47059;\cssrgb\c80000\c80000\c80000;\cssrgb\c41569\c60000\c33333;\cssrgb\c70980\c80784\c65882;\cssrgb\c61176\c86275\c99608;
+\cssrgb\c83137\c83137\c83137;\cssrgb\c30588\c78824\c69020;\cssrgb\c86275\c86275\c66667;\cssrgb\c84314\c72941\c49020;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww20900\viewh12200\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs24 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 <stdio.h>\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 <unistd.h>\cf4 \strokec4       \cf7 \strokec7 /* find current location */\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 <stdlib.h>\cf4 \strokec4      \cf7 \strokec7 /* srand, rand */\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 <time.h>\cf4 \strokec4        \cf7 \strokec7 /* clock_t, clock, CLOCKS_PER_SEC */\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 <string.h>\cf4 \strokec4      \cf7 \strokec7 /* strcat */\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 <math.h>\cf4 \strokec4        \cf7 \strokec7 /* math calc */\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 <omp.h>\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #include\cf4 \strokec4  \cf5 \strokec5 <float.h>\cf4 \strokec4       \cf6 \cb1 \strokec6 \
+\
+\cf2 \cb3 \strokec2 #define\cf4 \strokec4  INPUT_FILE_NAME \cf5 \strokec5 "input.txt"\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #define\cf4 \strokec4  NUMCITY \cf8 \strokec8 15\cf7 \strokec7       // Max number of input cities\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #define\cf4 \strokec4  LANDSIZE \cf8 \strokec8 100\cf7 \strokec7     // Max value during random value generation\cf6 \cb1 \strokec6 \
+\cf2 \cb3 \strokec2 #define\cf4 \strokec4  square(\cf9 \strokec9 A\cf4 \strokec4 ) ((A) \cf10 \strokec10 *\cf4 \strokec4  (A))\cf6 \cb1 \strokec6 \
+\
+\cf4 \cb3 \strokec4 typedef\cf6 \strokec6  \cf4 \strokec4 int\cf6 \strokec6  \cf11 \strokec11 City\cf6 \strokec6 [\cf8 \strokec8 2\cf6 \strokec6 ];\cb1 \
+\
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf12 \strokec12 Input\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 cities\cf6 \strokec6 []);\cf7 \strokec7                                    // Take input from file of city\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf12 \strokec12 generate\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 cities\cf6 \strokec6 []);\cf7 \strokec7                                // Generate random city\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf12 \strokec12 print_cities\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 cities\cf6 \strokec6 []);\cf7 \strokec7                            // Print all the cities\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 float\cf6 \strokec6  \cf12 \strokec12 distance\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 city1\cf6 \strokec6 , \cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 city2\cf6 \strokec6 );\cf7 \strokec7                      // Find Distance between 2 cities\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf12 \strokec12 copy_tour\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 citiesDest\cf6 \strokec6 [], \cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 citiesSource\cf6 \strokec6 []);\cf7 \strokec7      // Copy toured cities\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf12 \strokec12 copy_City\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 dest\cf6 \strokec6 , \cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 source\cf6 \strokec6 );\cf7 \strokec7                       // Copy one city to another\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf12 \strokec12 swap_cities\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 city1\cf6 \strokec6 , \cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 city2\cf6 \strokec6 );\cf7 \strokec7                    // Swap 2 cities\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf12 \strokec12 circ_perm\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 cities\cf6 \strokec6 [], \cf4 \strokec4 int\cf6 \strokec6  \cf9 \strokec9 numCities\cf6 \strokec6 );\cf7 \strokec7                // Circular permutation of cities\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf12 \strokec12 scramble\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 cities\cf6 \strokec6 [], \cf11 \strokec11 City\cf6 \strokec6  \cf4 \strokec4 *\cf9 \strokec9 pivot\cf6 \strokec6 , \cf4 \strokec4 int\cf6 \strokec6  \cf9 \strokec9 numCities\cf6 \strokec6 );\cf7 \strokec7    // Generate all combinations by brute-force approach\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf12 \strokec12 target_function\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 cities\cf6 \strokec6 []);\cf7 \strokec7                          // Get final smallest value by comparison\cf6 \cb1 \strokec6 \
+\cf4 \cb3 \strokec4 float\cf6 \strokec6  \cf12 \strokec12 tour_length\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 cities\cf6 \strokec6 []);\cf7 \strokec7                             // Get total tour length\cf6 \cb1 \strokec6 \
+\
+\cf4 \cb3 \strokec4 float\cf6 \strokec6  \cf9 \strokec9 shortestTourLength\cf6 \strokec6  \cf10 \strokec10 =\cf6 \strokec6  \cf4 \strokec4 FLT_MAX\cf6 \strokec6 ; \cb1 \
+\cf11 \cb3 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 shortestTour\cf6 \strokec6 [\cf4 \strokec4 NUMCITY\cf6 \strokec6 ];\cb1 \
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf9 \strokec9 total_no_of_input\cf6 \strokec6  \cf10 \strokec10 =\cf6 \strokec6  \cf8 \strokec8 0\cf6 \strokec6 ;\cb1 \
+\
+\cf4 \cb3 \strokec4 int\cf6 \strokec6  \cf12 \strokec12 main\cf6 \strokec6 () \{\cb1 \
+\cb3     \cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 cities\cf6 \strokec6 [\cf4 \strokec4 NUMCITY\cf6 \strokec6 ];\cb1 \
+\cb3     \cf4 \strokec4 double\cf6 \strokec6  \cf9 \strokec9 executionTime\cf6 \strokec6 ;\cf7 \strokec7  // Variable to store execution time for a single run\cf6 \cb1 \strokec6 \
+\
+\cf7 \cb3 \strokec7     // Run the code only once\cf6 \cb1 \strokec6 \
+\cb3     \cf12 \strokec12 Input\cf6 \strokec6 (\cf9 \strokec9 cities\cf6 \strokec6 );\cb1 \
+\cb3     \cf12 \strokec12 printf\cf6 \strokec6 (\cf5 \strokec5 "Total No of Input = \cf9 \strokec9 %d\cf13 \strokec13 \\n\cf5 \strokec5 "\cf6 \strokec6 , \cf9 \strokec9 total_no_of_input\cf6 \strokec6 );\cb1 \
+\
+\cf7 \cb3 \strokec7     // Time calculation Start\cf6 \cb1 \strokec6 \
+\cb3     \cf11 \strokec11 clock_t\cf6 \strokec6  \cf9 \strokec9 t\cf6 \strokec6 ;\cb1 \
+\cb3     \cf9 \strokec9 t\cf6 \strokec6  \cf10 \strokec10 =\cf6 \strokec6  \cf12 \strokec12 clock\cf6 \strokec6 ();\cb1 \
+\cb3     \cb1 \
+\cb3     \cf9 \strokec9 shortestTourLength\cf6 \strokec6  \cf10 \strokec10 =\cf6 \strokec6  \cf12 \strokec12 tour_length\cf6 \strokec6 (\cf9 \strokec9 cities\cf6 \strokec6 );\cf7 \strokec7     // Generate initial value - not final\cf6 \cb1 \strokec6 \
+\cb3     \cf12 \strokec12 copy_tour\cf6 \strokec6 (\cf9 \strokec9 shortestTour\cf6 \strokec6 , \cf9 \strokec9 cities\cf6 \strokec6 );\cb1 \
+\cb3     \cf12 \strokec12 scramble\cf6 \strokec6 (\cf9 \strokec9 cities\cf6 \strokec6 , \cf9 \strokec9 cities\cf6 \strokec6 , \cf9 \strokec9 total_no_of_input\cf6 \strokec6 );\cf7 \strokec7   // Original non-parallelized section\cf6 \cb1 \strokec6 \
+\cb3     \cf12 \strokec12 printf\cf6 \strokec6 (\cf5 \strokec5 "Found the shortest tour:\cf13 \strokec13 \\n\cf5 \strokec5 "\cf6 \strokec6 );\cb1 \
+\cb3     \cf12 \strokec12 print_cities\cf6 \strokec6 (\cf9 \strokec9 shortestTour\cf6 \strokec6 );\cb1 \
+\cb3     \cf12 \strokec12 printf\cf6 \strokec6 (\cf5 \strokec5 "Length is: \cf9 \strokec9 %f\cf13 \strokec13 \\n\cf5 \strokec5 "\cf6 \strokec6 , \cf9 \strokec9 shortestTourLength\cf6 \strokec6 );\cb1 \
+\
+\cf7 \cb3 \strokec7     // Time calculation End\cf6 \cb1 \strokec6 \
+\cb3     \cf9 \strokec9 t\cf6 \strokec6  \cf10 \strokec10 =\cf6 \strokec6  \cf12 \strokec12 clock\cf6 \strokec6 () \cf10 \strokec10 -\cf6 \strokec6  \cf9 \strokec9 t\cf6 \strokec6 ;\cb1 \
+\cb3     \cf9 \strokec9 executionTime\cf6 \strokec6  \cf10 \strokec10 =\cf6 \strokec6  ((\cf4 \strokec4 double\cf6 \strokec6 )\cf9 \strokec9 t\cf6 \strokec6 ) \cf10 \strokec10 /\cf6 \strokec6  \cf4 \strokec4 CLOCKS_PER_SEC\cf6 \strokec6 ;\cf7 \strokec7  // Store execution time for this single run\cf6 \cb1 \strokec6 \
+\cb3     \cf12 \strokec12 printf\cf6 \strokec6 (\cf5 \strokec5 "Execution Time: \cf9 \strokec9 %f\cf5 \strokec5  second(s).\cf13 \strokec13 \\n\cf5 \strokec5 "\cf6 \strokec6 , \cf9 \strokec9 executionTime\cf6 \strokec6 );\cb1 \
+\
+\cb3     \cf2 \strokec2 return\cf6 \strokec6  \cf8 \strokec8 0\cf6 \strokec6 ;\cb1 \
+\cb3 \}\cb1 \
+\
+\
+\
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf12 \strokec12 Input\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 cities\cf6 \strokec6 []) \{\cb1 \
+\cb3     \cf11 \strokec11 FILE\cf6 \strokec6  \cf10 \strokec10 *\cf9 \strokec9 fp\cf6 \strokec6 ;\cb1 \
+\cb3     \cf4 \strokec4 char\cf6 \strokec6  \cf9 \strokec9 cwd\cf6 \strokec6 [\cf8 \strokec8 1024\cf6 \strokec6 ];\cb1 \
+\
+\cf7 \cb3 \strokec7     // Get current directory\cf6 \cb1 \strokec6 \
+\cb3     \cf2 \strokec2 if\cf6 \strokec6  (\cf12 \strokec12 getcwd\cf6 \strokec6 (\cf9 \strokec9 cwd\cf6 \strokec6 , \cf4 \strokec4 sizeof\cf6 \strokec6 (\cf9 \strokec9 cwd\cf6 \strokec6 )) \cf10 \strokec10 ==\cf6 \strokec6  \cf4 \strokec4 NULL\cf6 \strokec6 ) \{\cf7 \strokec7   // Directory not found\cf6 \cb1 \strokec6 \
+\cb3         \cf12 \strokec12 perror\cf6 \strokec6 (\cf5 \strokec5 "getcwd() error - Current directory not found !!"\cf6 \strokec6 );\cb1 \
+\cb3         \cf12 \strokec12 exit\cf6 \strokec6 (\cf4 \strokec4 EXIT_FAILURE\cf6 \strokec6 );\cb1 \
+\cb3     \}\cb1 \
+\cb3     \cb1 \
+\cb3     \cf12 \strokec12 strcat\cf6 \strokec6 (\cf9 \strokec9 cwd\cf6 \strokec6 , \cf5 \strokec5 "/"\cf6 \strokec6 );\cf7 \strokec7   // Use '/' for compatibility with UNIX-like systems\cf6 \cb1 \strokec6 \
+\cb3     \cf12 \strokec12 strcat\cf6 \strokec6 (\cf9 \strokec9 cwd\cf6 \strokec6 , \cf4 \strokec4 INPUT_FILE_NAME\cf6 \strokec6 );\cb1 \
+\cb3     \cf9 \strokec9 fp\cf6 \strokec6  \cf10 \strokec10 =\cf6 \strokec6  \cf12 \strokec12 fopen\cf6 \strokec6 (\cf9 \strokec9 cwd\cf6 \strokec6 , \cf5 \strokec5 "r"\cf6 \strokec6 );\cb1 \
+\
+\cb3     \cf2 \strokec2 if\cf6 \strokec6  (\cf9 \strokec9 fp\cf6 \strokec6  \cf10 \strokec10 ==\cf6 \strokec6  \cf4 \strokec4 NULL\cf6 \strokec6 ) \{\cf7 \strokec7   // Check if file opened successfully\cf6 \cb1 \strokec6 \
+\cb3         \cf12 \strokec12 perror\cf6 \strokec6 (\cf5 \strokec5 "Error opening file"\cf6 \strokec6 );\cb1 \
+\cb3         \cf12 \strokec12 exit\cf6 \strokec6 (\cf4 \strokec4 EXIT_FAILURE\cf6 \strokec6 );\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf4 \strokec4 int\cf6 \strokec6  \cf9 \strokec9 i\cf6 \strokec6  \cf10 \strokec10 =\cf6 \strokec6  \cf8 \strokec8 0\cf6 \strokec6 ;\cb1 \
+\cb3     \cf2 \strokec2 while\cf6 \strokec6  (\cf9 \strokec9 i\cf6 \strokec6  \cf10 \strokec10 <\cf6 \strokec6  \cf4 \strokec4 NUMCITY\cf6 \strokec6  \cf10 \strokec10 &&\cf6 \strokec6  \cf12 \strokec12 fscanf\cf6 \strokec6 (\cf9 \strokec9 fp\cf6 \strokec6 , \cf5 \strokec5 "\cf9 \strokec9 %d\cf5 \strokec5  \cf9 \strokec9 %d\cf5 \strokec5 "\cf6 \strokec6 , \cf10 \strokec10 &\cf9 \strokec9 cities\cf6 \strokec6 [\cf9 \strokec9 i\cf6 \strokec6 ][\cf8 \strokec8 0\cf6 \strokec6 ], \cf10 \strokec10 &\cf9 \strokec9 cities\cf6 \strokec6 [\cf9 \strokec9 i\cf6 \strokec6 ][\cf8 \strokec8 1\cf6 \strokec6 ]) \cf10 \strokec10 ==\cf6 \strokec6  \cf8 \strokec8 2\cf6 \strokec6 ) \{\cb1 \
+\cb3         \cf12 \strokec12 printf\cf6 \strokec6 (\cf5 \strokec5 "City[\cf9 \strokec9 %d\cf5 \strokec5 ]: (\cf9 \strokec9 %d\cf5 \strokec5 , \cf9 \strokec9 %d\cf5 \strokec5 )\cf13 \strokec13 \\n\cf5 \strokec5 "\cf6 \strokec6 , \cf9 \strokec9 i\cf6 \strokec6 , \cf9 \strokec9 cities\cf6 \strokec6 [\cf9 \strokec9 i\cf6 \strokec6 ][\cf8 \strokec8 0\cf6 \strokec6 ], \cf9 \strokec9 cities\cf6 \strokec6 [\cf9 \strokec9 i\cf6 \strokec6 ][\cf8 \strokec8 1\cf6 \strokec6 ]);\cf7 \strokec7  // Debug print\cf6 \cb1 \strokec6 \
+\cb3         \cf9 \strokec9 total_no_of_input\cf10 \strokec10 ++\cf6 \strokec6 ;\cb1 \
+\cb3         \cf9 \strokec9 i\cf10 \strokec10 ++\cf6 \strokec6 ;\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf12 \strokec12 fclose\cf6 \strokec6 (\cf9 \strokec9 fp\cf6 \strokec6 );\cf7 \strokec7  // Close the file\cf6 \cb1 \strokec6 \
+\cb3 \}\cb1 \
+\
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf12 \strokec12 generate\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 cities\cf6 \strokec6 []) \{\cb1 \
+\cb3     \cf4 \strokec4 int\cf6 \strokec6  \cf9 \strokec9 i\cf6 \strokec6 , \cf9 \strokec9 j\cf6 \strokec6 ;\cb1 \
+\cb3     \cf9 \strokec9 total_no_of_input\cf6 \strokec6  \cf10 \strokec10 =\cf6 \strokec6  \cf4 \strokec4 NUMCITY\cf6 \strokec6 ;\cb1 \
+\cb3     \cf2 \strokec2 for\cf6 \strokec6  (\cf9 \strokec9 i\cf6 \strokec6  \cf10 \strokec10 =\cf6 \strokec6  \cf8 \strokec8 0\cf6 \strokec6 ; \cf9 \strokec9 i\cf6 \strokec6  \cf10 \strokec10 <\cf6 \strokec6  \cf4 \strokec4 NUMCITY\cf6 \strokec6 ; \cf9 \strokec9 i\cf10 \strokec10 ++\cf6 \strokec6 )\cb1 \
+\cb3         \cf2 \strokec2 for\cf6 \strokec6  (\cf9 \strokec9 j\cf6 \strokec6  \cf10 \strokec10 =\cf6 \strokec6  \cf8 \strokec8 0\cf6 \strokec6 ; \cf9 \strokec9 j\cf6 \strokec6  \cf10 \strokec10 <\cf6 \strokec6  \cf8 \strokec8 2\cf6 \strokec6 ; \cf9 \strokec9 j\cf10 \strokec10 ++\cf6 \strokec6 )\cb1 \
+\cb3             \cf9 \strokec9 cities\cf6 \strokec6 [\cf9 \strokec9 i\cf6 \strokec6 ][\cf9 \strokec9 j\cf6 \strokec6 ] \cf10 \strokec10 =\cf6 \strokec6  \cf12 \strokec12 rand\cf6 \strokec6 () \cf10 \strokec10 %\cf6 \strokec6  \cf4 \strokec4 LANDSIZE\cf6 \strokec6 ;\cb1 \
+\cb3 \}\cb1 \
+\
+\
+\cf4 \cb3 \strokec4 float\cf6 \strokec6  \cf12 \strokec12 tour_length\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 cities\cf6 \strokec6 []) \{\cb1 \
+\cb3     \cf4 \strokec4 int\cf6 \strokec6  \cf9 \strokec9 i\cf6 \strokec6 ;\cb1 \
+\cb3     \cf4 \strokec4 float\cf6 \strokec6  \cf9 \strokec9 length\cf6 \strokec6  \cf10 \strokec10 =\cf6 \strokec6  \cf8 \strokec8 0.0\cf6 \strokec6 ;\cb1 \
+\cb3     \cb1 \
+\cf7 \cb3 \strokec7     // Original loop without parallelization\cf6 \cb1 \strokec6 \
+\cb3     \cf2 \strokec2 for\cf6 \strokec6  (\cf9 \strokec9 i\cf6 \strokec6  \cf10 \strokec10 =\cf6 \strokec6  \cf8 \strokec8 0\cf6 \strokec6 ; \cf9 \strokec9 i\cf6 \strokec6  \cf10 \strokec10 <\cf6 \strokec6  \cf9 \strokec9 total_no_of_input\cf6 \strokec6  \cf10 \strokec10 -\cf6 \strokec6  \cf8 \strokec8 1\cf6 \strokec6 ; \cf9 \strokec9 i\cf10 \strokec10 ++\cf6 \strokec6 ) \{\cb1 \
+\cb3         \cf9 \strokec9 length\cf6 \strokec6  \cf10 \strokec10 +=\cf6 \strokec6  \cf12 \strokec12 distance\cf6 \strokec6 (\cf9 \strokec9 cities\cf6 \strokec6 [\cf9 \strokec9 i\cf6 \strokec6 ], \cf9 \strokec9 cities\cf6 \strokec6 [\cf9 \strokec9 i\cf6 \strokec6  \cf10 \strokec10 +\cf6 \strokec6  \cf8 \strokec8 1\cf6 \strokec6 ]);\cb1 \
+\cb3     \}\cb1 \
+\cb3     \cf9 \strokec9 length\cf6 \strokec6  \cf10 \strokec10 +=\cf6 \strokec6  \cf12 \strokec12 distance\cf6 \strokec6 (\cf9 \strokec9 cities\cf6 \strokec6 [\cf9 \strokec9 total_no_of_input\cf6 \strokec6  \cf10 \strokec10 -\cf6 \strokec6  \cf8 \strokec8 1\cf6 \strokec6 ], \cf9 \strokec9 cities\cf6 \strokec6 [\cf8 \strokec8 0\cf6 \strokec6 ]);\cf7 \strokec7  // Still a shared variable with potential race\cf6 \cb1 \strokec6 \
+\cb3     \cf2 \strokec2 return\cf6 \strokec6  \cf9 \strokec9 length\cf6 \strokec6 ;\cb1 \
+\cb3 \}\cb1 \
+\
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf12 \strokec12 target_function\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 cities\cf6 \strokec6 []) \{\cb1 \
+\cb3     \cf4 \strokec4 float\cf6 \strokec6  \cf9 \strokec9 length\cf6 \strokec6  \cf10 \strokec10 =\cf6 \strokec6  \cf12 \strokec12 tour_length\cf6 \strokec6 (\cf9 \strokec9 cities\cf6 \strokec6 );\cb1 \
+\cb3     \cf2 \strokec2 if\cf6 \strokec6  (\cf9 \strokec9 length\cf6 \strokec6  \cf10 \strokec10 <\cf6 \strokec6  \cf9 \strokec9 shortestTourLength\cf6 \strokec6 ) \{\cf7 \strokec7   // Update shortestTourLength\cf6 \cb1 \strokec6 \
+\cb3         \cf9 \strokec9 shortestTourLength\cf6 \strokec6  \cf10 \strokec10 =\cf6 \strokec6  \cf9 \strokec9 length\cf6 \strokec6 ;\cb1 \
+\cb3         \cf12 \strokec12 copy_tour\cf6 \strokec6 (\cf9 \strokec9 shortestTour\cf6 \strokec6 , \cf9 \strokec9 cities\cf6 \strokec6 );\cb1 \
+\cb3     \}\cb1 \
+\cb3 \}\cb1 \
+\
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf12 \strokec12 scramble\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 cities\cf6 \strokec6 [], \cf11 \strokec11 City\cf6 \strokec6  \cf4 \strokec4 *\cf9 \strokec9 pivot\cf6 \strokec6 , \cf4 \strokec4 int\cf6 \strokec6  \cf9 \strokec9 numCities\cf6 \strokec6 ) \{\cb1 \
+\cb3     \cf4 \strokec4 int\cf6 \strokec6  \cf9 \strokec9 i\cf6 \strokec6 ;\cb1 \
+\cb3     \cf2 \strokec2 if\cf6 \strokec6  (\cf9 \strokec9 numCities\cf6 \strokec6  \cf10 \strokec10 <=\cf6 \strokec6  \cf8 \strokec8 1\cf6 \strokec6 ) \{\cb1 \
+\cb3         \cf12 \strokec12 target_function\cf6 \strokec6 (\cf9 \strokec9 cities\cf6 \strokec6 );\cb1 \
+\cb3         \cf2 \strokec2 return\cf6 \strokec6 ;\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf2 \strokec2 for\cf6 \strokec6  (\cf9 \strokec9 i\cf6 \strokec6  \cf10 \strokec10 =\cf6 \strokec6  \cf8 \strokec8 0\cf6 \strokec6 ; \cf9 \strokec9 i\cf6 \strokec6  \cf10 \strokec10 <\cf6 \strokec6  \cf9 \strokec9 numCities\cf6 \strokec6 ; \cf9 \strokec9 i\cf10 \strokec10 ++\cf6 \strokec6 ) \{\cb1 \
+\cb3         \cf11 \strokec11 City\cf6 \strokec6  \cf10 \strokec10 *\cf9 \strokec9 newPivot\cf6 \strokec6  \cf10 \strokec10 =\cf6 \strokec6  \cf10 \strokec10 &\cf9 \strokec9 pivot\cf6 \strokec6 [\cf8 \strokec8 1\cf6 \strokec6 ];\cb1 \
+\cb3         \cf12 \strokec12 scramble\cf6 \strokec6 (\cf9 \strokec9 cities\cf6 \strokec6 , \cf9 \strokec9 newPivot\cf6 \strokec6 , \cf9 \strokec9 numCities\cf6 \strokec6  \cf10 \strokec10 -\cf6 \strokec6  \cf8 \strokec8 1\cf6 \strokec6 );\cf7 \strokec7   // Non-parallelized recursion\cf6 \cb1 \strokec6 \
+\cb3         \cf12 \strokec12 circ_perm\cf6 \strokec6 (\cf9 \strokec9 pivot\cf6 \strokec6 , \cf9 \strokec9 numCities\cf6 \strokec6 );\cb1 \
+\cb3     \}\cb1 \
+\cb3 \}\cb1 \
+\
+\
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf12 \strokec12 circ_perm\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 cities\cf6 \strokec6 [], \cf4 \strokec4 int\cf6 \strokec6  \cf9 \strokec9 numCities\cf6 \strokec6 ) \{\cb1 \
+\cb3     \cf4 \strokec4 int\cf6 \strokec6  \cf9 \strokec9 i\cf6 \strokec6 ;\cb1 \
+\cb3     \cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 tmp\cf6 \strokec6 ;\cb1 \
+\cb3     \cf12 \strokec12 copy_City\cf6 \strokec6 (\cf9 \strokec9 tmp\cf6 \strokec6 , \cf9 \strokec9 cities\cf6 \strokec6 [\cf8 \strokec8 0\cf6 \strokec6 ]);\cb1 \
+\cb3     \cf2 \strokec2 for\cf6 \strokec6  (\cf9 \strokec9 i\cf6 \strokec6  \cf10 \strokec10 =\cf6 \strokec6  \cf8 \strokec8 0\cf6 \strokec6 ; \cf9 \strokec9 i\cf6 \strokec6  \cf10 \strokec10 <\cf6 \strokec6  \cf9 \strokec9 numCities\cf6 \strokec6  \cf10 \strokec10 -\cf6 \strokec6  \cf8 \strokec8 1\cf6 \strokec6 ; \cf9 \strokec9 i\cf10 \strokec10 ++\cf6 \strokec6 )\cb1 \
+\cb3         \cf12 \strokec12 copy_City\cf6 \strokec6 (\cf9 \strokec9 cities\cf6 \strokec6 [\cf9 \strokec9 i\cf6 \strokec6 ], \cf9 \strokec9 cities\cf6 \strokec6 [\cf9 \strokec9 i\cf6 \strokec6  \cf10 \strokec10 +\cf6 \strokec6  \cf8 \strokec8 1\cf6 \strokec6 ]);\cb1 \
+\cb3     \cf12 \strokec12 copy_City\cf6 \strokec6 (\cf9 \strokec9 cities\cf6 \strokec6 [\cf9 \strokec9 numCities\cf6 \strokec6  \cf10 \strokec10 -\cf6 \strokec6  \cf8 \strokec8 1\cf6 \strokec6 ], \cf9 \strokec9 tmp\cf6 \strokec6 );\cb1 \
+\cb3 \}\cb1 \
+\
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf12 \strokec12 copy_tour\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 citiesDest\cf6 \strokec6 [], \cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 citiesSource\cf6 \strokec6 []) \{\cb1 \
+\cb3     \cf4 \strokec4 int\cf6 \strokec6  \cf9 \strokec9 i\cf6 \strokec6 ;\cb1 \
+\cb3     \cf2 \strokec2 for\cf6 \strokec6  (\cf9 \strokec9 i\cf6 \strokec6  \cf10 \strokec10 =\cf6 \strokec6  \cf8 \strokec8 0\cf6 \strokec6 ; \cf9 \strokec9 i\cf6 \strokec6  \cf10 \strokec10 <\cf6 \strokec6  \cf4 \strokec4 NUMCITY\cf6 \strokec6 ; \cf9 \strokec9 i\cf10 \strokec10 ++\cf6 \strokec6 )\cb1 \
+\cb3         \cf12 \strokec12 copy_City\cf6 \strokec6 (\cf9 \strokec9 citiesDest\cf6 \strokec6 [\cf9 \strokec9 i\cf6 \strokec6 ], \cf9 \strokec9 citiesSource\cf6 \strokec6 [\cf9 \strokec9 i\cf6 \strokec6 ]);\cb1 \
+\cb3 \}\cb1 \
+\
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf12 \strokec12 copy_City\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 dest\cf6 \strokec6 , \cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 source\cf6 \strokec6 ) \{\cb1 \
+\cb3     \cf9 \strokec9 dest\cf6 \strokec6 [\cf8 \strokec8 0\cf6 \strokec6 ] \cf10 \strokec10 =\cf6 \strokec6  \cf9 \strokec9 source\cf6 \strokec6 [\cf8 \strokec8 0\cf6 \strokec6 ];\cb1 \
+\cb3     \cf9 \strokec9 dest\cf6 \strokec6 [\cf8 \strokec8 1\cf6 \strokec6 ] \cf10 \strokec10 =\cf6 \strokec6  \cf9 \strokec9 source\cf6 \strokec6 [\cf8 \strokec8 1\cf6 \strokec6 ];\cb1 \
+\cb3 \}\cb1 \
+\
+\cf4 \cb3 \strokec4 float\cf6 \strokec6  \cf12 \strokec12 distance\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 city1\cf6 \strokec6 , \cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 city2\cf6 \strokec6 ) \{\cb1 \
+\cb3     \cf2 \strokec2 return\cf6 \strokec6  \cf12 \strokec12 sqrtf\cf6 \strokec6 ((\cf4 \strokec4 float\cf6 \strokec6 )\cf4 \strokec4 square\cf6 \strokec6 (\cf9 \strokec9 city2\cf6 \strokec6 [\cf8 \strokec8 0\cf6 \strokec6 ] \cf10 \strokec10 -\cf6 \strokec6  \cf9 \strokec9 city1\cf6 \strokec6 [\cf8 \strokec8 0\cf6 \strokec6 ]) \cf10 \strokec10 +\cf6 \cb1 \strokec6 \
+\cb3                   (\cf4 \strokec4 float\cf6 \strokec6 )\cf4 \strokec4 square\cf6 \strokec6 (\cf9 \strokec9 city2\cf6 \strokec6 [\cf8 \strokec8 1\cf6 \strokec6 ] \cf10 \strokec10 -\cf6 \strokec6  \cf9 \strokec9 city1\cf6 \strokec6 [\cf8 \strokec8 1\cf6 \strokec6 ]));\cb1 \
+\cb3 \}\cb1 \
+\
+\cf4 \cb3 \strokec4 void\cf6 \strokec6  \cf12 \strokec12 print_cities\cf6 \strokec6 (\cf11 \strokec11 City\cf6 \strokec6  \cf9 \strokec9 cities\cf6 \strokec6 []) \{\cb1 \
+\cb3     \cf4 \strokec4 int\cf6 \strokec6  \cf9 \strokec9 i\cf6 \strokec6 ;\cb1 \
+\cb3     \cf2 \strokec2 for\cf6 \strokec6  (\cf9 \strokec9 i\cf6 \strokec6  \cf10 \strokec10 =\cf6 \strokec6  \cf8 \strokec8 0\cf6 \strokec6 ; \cf9 \strokec9 i\cf6 \strokec6  \cf10 \strokec10 <\cf6 \strokec6  \cf9 \strokec9 total_no_of_input\cf6 \strokec6 ; \cf9 \strokec9 i\cf10 \strokec10 ++\cf6 \strokec6 ) \{\cb1 \
+\cb3         \cf12 \strokec12 printf\cf6 \strokec6 (\cf5 \strokec5 "(\cf9 \strokec9 %d\cf5 \strokec5 ,\cf9 \strokec9 %d\cf5 \strokec5 )"\cf6 \strokec6 , \cf9 \strokec9 cities\cf6 \strokec6 [\cf9 \strokec9 i\cf6 \strokec6 ][\cf8 \strokec8 0\cf6 \strokec6 ], \cf9 \strokec9 cities\cf6 \strokec6 [\cf9 \strokec9 i\cf6 \strokec6 ][\cf8 \strokec8 1\cf6 \strokec6 ]);\cb1 \
+\cb3         \cf2 \strokec2 if\cf6 \strokec6  (\cf9 \strokec9 i\cf6 \strokec6  \cf10 \strokec10 <\cf6 \strokec6  \cf9 \strokec9 total_no_of_input\cf6 \strokec6  \cf10 \strokec10 -\cf6 \strokec6  \cf8 \strokec8 1\cf6 \strokec6 )\cb1 \
+\cb3             \cf12 \strokec12 printf\cf6 \strokec6 (\cf5 \strokec5 " , "\cf6 \strokec6 );\cb1 \
+\cb3     \}\cb1 \
+\cb3     \cf12 \strokec12 printf\cf6 \strokec6 (\cf5 \strokec5 "\cf13 \strokec13 \\n\cf5 \strokec5 "\cf6 \strokec6 );\cb1 \
+\cb3 \}\cb1 \
+\
+}
