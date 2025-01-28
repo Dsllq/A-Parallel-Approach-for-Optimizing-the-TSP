@@ -9,4 +9,4 @@ The primary goal of this project is to harness the power of **parallel computing
 This project builds upon the foundational work of [AbrarJahin](https://github.com/AbrarJahin/travelling-salesman-problem-brute-force).
 ☑️
 ## 🔘 License
-This parallel approach was developed as part of a **group project** for the **ARTI 503: Parallel Computer Architecture** course at **Imam Abdulrahman Bin Faisal University (IAU)**.
+This parallel approach is developed as part of a **group project** for the **ARTI 503: Parallel Computer Architecture** course at **Imam Abdulrahman Bin Faisal University (IAU)**.
